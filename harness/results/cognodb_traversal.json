@@ -5,25 +5,25 @@
     "warmup_iterations": 15,
     "results": {
         "1_hop": {
-            "p50_latency_ms": 283.07,
-            "p95_latency_ms": 435.92,
-            "mean_latency_ms": 316.64,
-            "min_latency_ms": 272.85,
-            "max_latency_ms": 1644.71
+            "p50_latency_ms": 263.33,
+            "p95_latency_ms": 270.63,
+            "mean_latency_ms": 262.62,
+            "min_latency_ms": 251.38,
+            "max_latency_ms": 284.44
         },
         "2_hop": {
-            "p50_latency_ms": 282.58,
-            "p95_latency_ms": 284.26,
-            "mean_latency_ms": 282.15,
-            "min_latency_ms": 273.77,
-            "max_latency_ms": 286.34
+            "p50_latency_ms": 263.12,
+            "p95_latency_ms": 271.25,
+            "mean_latency_ms": 263.67,
+            "min_latency_ms": 251.39,
+            "max_latency_ms": 290.87
         },
         "3_hop": {
-            "p50_latency_ms": 282.43,
-            "p95_latency_ms": 336.27,
-            "mean_latency_ms": 291.52,
-            "min_latency_ms": 272.95,
-            "max_latency_ms": 565.19
+            "p50_latency_ms": 263.29,
+            "p95_latency_ms": 273.37,
+            "mean_latency_ms": 267.89,
+            "min_latency_ms": 254.87,
+            "max_latency_ms": 576.99
         }
     }
 }

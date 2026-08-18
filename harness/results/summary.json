@@ -7,11 +7,11 @@
                 "nodes_loaded": 91489,
                 "relationships_loaded": 200000,
                 "batch_size": 1000,
-                "nodes_per_sec": 2222.98,
-                "relationships_per_sec": 2571.6,
-                "total_load_time_sec": 121.18,
-                "node_load_time_sec": 41.16,
-                "relationship_load_time_sec": 77.77
+                "nodes_per_sec": 2547.94,
+                "relationships_per_sec": 3034.11,
+                "total_load_time_sec": 102.88,
+                "node_load_time_sec": 35.91,
+                "relationship_load_time_sec": 65.92
             },
             "workloads": {
                 "traversal": {
@@ -21,25 +21,25 @@
                     "warmup_iterations": 15,
                     "results": {
                         "1_hop": {
-                            "p50_latency_ms": 283.07,
-                            "p95_latency_ms": 435.92,
-                            "mean_latency_ms": 316.64,
-                            "min_latency_ms": 272.85,
-                            "max_latency_ms": 1644.71
+                            "p50_latency_ms": 263.33,
+                            "p95_latency_ms": 270.63,
+                            "mean_latency_ms": 262.62,
+                            "min_latency_ms": 251.38,
+                            "max_latency_ms": 284.44
                         },
                         "2_hop": {
-                            "p50_latency_ms": 282.58,
-                            "p95_latency_ms": 284.26,
-                            "mean_latency_ms": 282.15,
-                            "min_latency_ms": 273.77,
-                            "max_latency_ms": 286.34
+                            "p50_latency_ms": 263.12,
+                            "p95_latency_ms": 271.25,
+                            "mean_latency_ms": 263.67,
+                            "min_latency_ms": 251.39,
+                            "max_latency_ms": 290.87
                         },
                         "3_hop": {
-                            "p50_latency_ms": 282.43,
-                            "p95_latency_ms": 336.27,
-                            "mean_latency_ms": 291.52,
-                            "min_latency_ms": 272.95,
-                            "max_latency_ms": 565.19
+                            "p50_latency_ms": 263.29,
+                            "p95_latency_ms": 273.37,
+                            "mean_latency_ms": 267.89,
+                            "min_latency_ms": 254.87,
+                            "max_latency_ms": 576.99
                         }
                     }
                 }
