@@ -36,18 +36,27 @@ def extract_random_starting_node_ids(nodes_csv_filepath, sample_count=BENCHMARK_
     return random.sample(available_node_ids_list, min(sample_count, len(available_node_ids_list)))
 
 def execute_single_traversal_query(neo4j_driver_instance, cypher_query_template, starting_user_node_id):
-    """Executes a single traversal query and measures precise latency in milliseconds."""
-    query_start_timestamp = time.perf_counter()
+    """Executes a single traversal query and returns both client end-to-end latency and server execution time in ms."""
+    client_query_start_timestamp = time.perf_counter()
+    server_execution_time_ms = 0.0
+    
     with neo4j_driver_instance.session() as active_database_session:
         query_result = active_database_session.run(cypher_query_template, {"start_id": int(starting_user_node_id)})
-        # Consume full result stream to ensure complete server-side query processing
-        query_result.consume()
-    query_elapsed_milliseconds = (time.perf_counter() - query_start_timestamp) * 1000.0
-    return query_elapsed_milliseconds
+        result_summary_metadata = query_result.consume()
+        
+        # Extract server-side execution time from driver metadata if available
+        if hasattr(result_summary_metadata, "result_available_after") and result_summary_metadata.result_available_after is not None:
+            server_execution_time_ms = float(result_summary_metadata.result_available_after)
+            
+    client_elapsed_milliseconds = (time.perf_counter() - client_query_start_timestamp) * 1000.0
+    return client_elapsed_milliseconds, server_execution_time_ms
 
 def evaluate_hop_depth_traversal(neo4j_driver_instance, hop_depth_level, cypher_query_template, starting_node_ids_sample):
     """Evaluates traversal performance for a specific hop depth (warm-up + measured iterations)."""
-    print(f"\n--- Benchmarking {hop_depth_level}-Hop Traversal ---", flush=True)
+    print(f"\n==================================================", flush=True)
+    print(f"       Benchmarking {hop_depth_level}-Hop Traversal Depth         ", flush=True)
+    print("==================================================", flush=True)
+    print(f"[Cypher Query Sent]:\n{cypher_query_template.strip()}\n", flush=True)
     
     warmup_node_samples = starting_node_ids_sample[:BENCHMARK_WARMUP_ITERATIONS]
     measured_node_samples = starting_node_ids_sample[BENCHMARK_WARMUP_ITERATIONS : BENCHMARK_WARMUP_ITERATIONS + BENCHMARK_MEASURED_ITERATIONS]
@@ -59,28 +68,40 @@ def evaluate_hop_depth_traversal(neo4j_driver_instance, hop_depth_level, cypher_
         
     # 2. Measured Benchmark Phase
     print(f"Running {len(measured_node_samples)} measured benchmark queries...", flush=True)
-    measured_latencies_list_ms = []
+    client_measured_latencies_list_ms = []
+    server_measured_latencies_list_ms = []
+    
     for iteration_counter, measured_node_id in enumerate(measured_node_samples, start=1):
-        elapsed_ms = execute_single_traversal_query(neo4j_driver_instance, cypher_query_template, measured_node_id)
-        measured_latencies_list_ms.append(elapsed_ms)
+        client_ms, server_ms = execute_single_traversal_query(neo4j_driver_instance, cypher_query_template, measured_node_id)
+        client_measured_latencies_list_ms.append(client_ms)
+        server_measured_latencies_list_ms.append(server_ms)
         if iteration_counter % 25 == 0 or iteration_counter == len(measured_node_samples):
             print(f"  Progress: {iteration_counter}/{len(measured_node_samples)} queries complete...", flush=True)
 
-    # 3. Calculate Percentiles (p50 median, p95 95th percentile)
-    percentile_50_p50 = float(np.percentile(measured_latencies_list_ms, 50))
-    percentile_95_p95 = float(np.percentile(measured_latencies_list_ms, 95))
-    mean_latency_val = float(np.mean(measured_latencies_list_ms))
-    min_latency_val = float(np.min(measured_latencies_list_ms))
-    max_latency_val = float(np.max(measured_latencies_list_ms))
+    # 3. Calculate Percentiles for Client Latency (p50 median, p95 95th percentile)
+    client_p50 = float(np.percentile(client_measured_latencies_list_ms, 50))
+    client_p95 = float(np.percentile(client_measured_latencies_list_ms, 95))
+    client_mean = float(np.mean(client_measured_latencies_list_ms))
+    client_min = float(np.min(client_measured_latencies_list_ms))
+    client_max = float(np.max(client_measured_latencies_list_ms))
     
-    print(f"  {hop_depth_level}-Hop Results -> p50: {percentile_50_p50:.2f} ms | p95: {percentile_95_p95:.2f} ms | mean: {mean_latency_val:.2f} ms", flush=True)
+    # Server-side execution percentiles
+    server_p50 = float(np.percentile(server_measured_latencies_list_ms, 50))
+    server_p95 = float(np.percentile(server_measured_latencies_list_ms, 95))
+    server_mean = float(np.mean(server_measured_latencies_list_ms))
+    
+    print(f"  Client-Side (Total incl. Network RTT) -> p50: {client_p50:.2f} ms | p95: {client_p95:.2f} ms | mean: {client_mean:.2f} ms", flush=True)
+    print(f"  Server-Side (DB Engine Only)          -> p50: {server_p50:.2f} ms | p95: {server_p95:.2f} ms | mean: {server_mean:.2f} ms", flush=True)
     
     return {
-        "p50_latency_ms": round(percentile_50_p50, 2),
-        "p95_latency_ms": round(percentile_95_p95, 2),
-        "mean_latency_ms": round(mean_latency_val, 2),
-        "min_latency_ms": round(min_latency_val, 2),
-        "max_latency_ms": round(max_latency_val, 2)
+        "p50_latency_ms": round(client_p50, 2),
+        "p95_latency_ms": round(client_p95, 2),
+        "mean_latency_ms": round(client_mean, 2),
+        "min_latency_ms": round(client_min, 2),
+        "max_latency_ms": round(client_max, 2),
+        "server_engine_p50_ms": round(server_p50, 2),
+        "server_engine_p95_ms": round(server_p95, 2),
+        "server_engine_mean_ms": round(server_mean, 2)
     }
 
 def run_traversal_benchmark_workload():
@@ -102,18 +123,9 @@ def run_traversal_benchmark_workload():
     
     # Define Cypher traversal templates for 1-hop, 2-hop, and 3-hop graph paths
     cypher_traversal_queries_dict = {
-        "1_hop": """
-            MATCH (source_user_node:User {id: $start_id})-[rel_link1:FRIEND_OF]->(hop1_user_node:User)
-            RETURN count(hop1_user_node) AS target_reach_count
-        """,
-        "2_hop": """
-            MATCH (source_user_node:User {id: $start_id})-[rel_link1:FRIEND_OF]->(hop1_user_node:User)-[rel_link2:FRIEND_OF]->(hop2_user_node:User)
-            RETURN count(DISTINCT hop2_user_node) AS target_reach_count
-        """,
-        "3_hop": """
-            MATCH (source_user_node:User {id: $start_id})-[rel_link1:FRIEND_OF]->(hop1_user_node:User)-[rel_link2:FRIEND_OF]->(hop2_user_node:User)-[rel_link3:FRIEND_OF]->(hop3_user_node:User)
-            RETURN count(DISTINCT hop3_user_node) AS target_reach_count
-        """
+        "1_hop": """MATCH (source_user_node:User {id: $start_id})-[rel_link1:FRIEND_OF]->(hop1_user_node:User) RETURN count(hop1_user_node) AS target_reach_count""",
+        "2_hop": """MATCH (source_user_node:User {id: $start_id})-[rel_link1:FRIEND_OF]->(hop1_user_node:User)-[rel_link2:FRIEND_OF]->(hop2_user_node:User) RETURN count(DISTINCT hop2_user_node) AS target_reach_count""",
+        "3_hop": """MATCH (source_user_node:User {id: $start_id})-[rel_link1:FRIEND_OF]->(hop1_user_node:User)-[rel_link2:FRIEND_OF]->(hop2_user_node:User)-[rel_link3:FRIEND_OF]->(hop3_user_node:User) RETURN count(DISTINCT hop3_user_node) AS target_reach_count"""
     }
     
     benchmark_hop_results_dict = {}
@@ -146,7 +158,7 @@ def run_traversal_benchmark_workload():
     print("==================================================", flush=True)
     for hop_level_key, metrics_data in benchmark_hop_results_dict.items():
         formatted_hop_title = hop_level_key.replace("_", "-").upper()
-        print(f"[{formatted_hop_title}] p50: {metrics_data['p50_latency_ms']} ms | p95: {metrics_data['p95_latency_ms']} ms | mean: {metrics_data['mean_latency_ms']} ms", flush=True)
+        print(f"[{formatted_hop_title}] Client p50: {metrics_data['p50_latency_ms']} ms | Client p95: {metrics_data['p95_latency_ms']} ms | Server Engine p50: {metrics_data['server_engine_p50_ms']} ms", flush=True)
     print(f"Results Output File: {TRAVERSAL_METRICS_JSON_PATH}", flush=True)
     print("==================================================\n", flush=True)
 
