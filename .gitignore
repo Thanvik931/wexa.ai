@@ -1,4 +1,17 @@
+# Environment variables
 .env
+
+# Python bytecode and caches
 __pycache__/
-*.pyc
+*.py[cod]
+*$py.class
 .venv/
+venv/
+
+# Results raw data
+harness/results/raw/*
+!harness/results/raw/.gitkeep
+results/raw/*
+
+# Node modules
+node_modules/
