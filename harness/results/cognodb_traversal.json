@@ -1,0 +1,29 @@
+{
+    "platform": "CognoDB",
+    "workload": "traversal",
+    "iterations_per_hop": 100,
+    "warmup_iterations": 15,
+    "results": {
+        "1_hop": {
+            "p50_latency_ms": 302.29,
+            "p95_latency_ms": 359.24,
+            "mean_latency_ms": 299.27,
+            "min_latency_ms": 255.93,
+            "max_latency_ms": 559.28
+        },
+        "2_hop": {
+            "p50_latency_ms": 304.4,
+            "p95_latency_ms": 397.05,
+            "mean_latency_ms": 305.22,
+            "min_latency_ms": 256.07,
+            "max_latency_ms": 463.03
+        },
+        "3_hop": {
+            "p50_latency_ms": 303.79,
+            "p95_latency_ms": 405.6,
+            "mean_latency_ms": 307.82,
+            "min_latency_ms": 255.21,
+            "max_latency_ms": 607.13
+        }
+    }
+}
