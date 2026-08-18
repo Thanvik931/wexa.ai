@@ -13,5 +13,11 @@ harness/results/raw/*
 !harness/results/raw/.gitkeep
 results/raw/*
 
+# Dataset archives and generated data files
+*.gz
+data/*.gz
+data/*.csv
+!data/.gitkeep
+
 # Node modules
 node_modules/
