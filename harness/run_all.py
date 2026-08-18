@@ -5,68 +5,57 @@ import json
 import subprocess
 import pandas as pd
 
-# List of target comparison platforms to orchestrate
-TARGET_PLATFORMS_CONFIG_LIST = ["cognodb"]
+PLATFORMS = ["cognodb"]
 
-SCRIPT_LOCATION_DIRECTORY = os.path.dirname(os.path.abspath(__file__))
-PROJECT_ROOT_DIRECTORY = os.path.abspath(os.path.join(SCRIPT_LOCATION_DIRECTORY, ".."))
-LOADERS_DIRECTORY_PATH = os.path.join(PROJECT_ROOT_DIRECTORY, "loaders")
-WORKLOADS_DIRECTORY_PATH = os.path.join(PROJECT_ROOT_DIRECTORY, "workloads")
-HARNESS_RESULTS_DIRECTORY = os.path.join(PROJECT_ROOT_DIRECTORY, "harness", "results")
+base_dir = os.path.dirname(os.path.abspath(__file__))
+project_root = os.path.abspath(os.path.join(base_dir, ".."))
+loaders_dir = os.path.join(project_root, "loaders")
+workloads_dir = os.path.join(project_root, "workloads")
+results_dir = os.path.join(project_root, "harness", "results")
 
-CONSOLIDATED_SUMMARY_JSON_PATH = os.path.join(HARNESS_RESULTS_DIRECTORY, "summary.json")
-CONSOLIDATED_SUMMARY_CSV_PATH = os.path.join(HARNESS_RESULTS_DIRECTORY, "summary.csv")
+summary_json = os.path.join(results_dir, "summary.json")
+summary_csv = os.path.join(results_dir, "summary.csv")
 
-def execute_python_subprocess_module(module_script_path, description_label):
-    """Executes a benchmark loader or workload script as an isolated Python subprocess."""
-    print(f"\n---> [Subprocess] Launching {description_label} ({os.path.basename(module_script_path)})...", flush=True)
-    execution_start_timestamp = time.perf_counter()
-    subprocess_process_result = subprocess.run(
-        [sys.executable, module_script_path],
-        cwd=PROJECT_ROOT_DIRECTORY,
-        capture_output=False
-    )
-    execution_elapsed_seconds = time.perf_counter() - execution_start_timestamp
-    if subprocess_process_result.returncode != 0:
-        print(f"[Subprocess Failure] {description_label} exited with error code {subprocess_process_result.returncode}!", flush=True)
-        return False, execution_elapsed_seconds
-    print(f"[Subprocess Success] Completed {description_label} in {execution_elapsed_seconds:.2f} seconds.", flush=True)
-    return True, execution_elapsed_seconds
+def run_subprocess(script_path, label):
+    print(f"\n---> Running {label} ({os.path.basename(script_path)})...", flush=True)
+    t0 = time.perf_counter()
+    res = subprocess.run([sys.executable, script_path], cwd=project_root, capture_output=False)
+    elapsed = time.perf_counter() - t0
+    
+    if res.returncode != 0:
+        print(f"[Error] {label} failed with exit code {res.returncode}.", flush=True)
+        return False, elapsed
+    print(f"[Done] {label} finished in {elapsed:.2f}s.", flush=True)
+    return True, elapsed
 
-def aggregate_platform_benchmark_results(platform_identifier_name):
-    """Reads individual load and workload JSON output files for a platform and aggregates them."""
-    platform_aggregated_metrics_dict = {
-        "platform": platform_identifier_name.capitalize(),
+def collect_results(platform):
+    metrics = {
+        "platform": platform.capitalize(),
         "load_metrics": {},
         "workloads": {}
     }
     
-    # Read platform loader metrics
-    loader_json_filepath = os.path.join(HARNESS_RESULTS_DIRECTORY, f"{platform_identifier_name}_load.json")
-    if os.path.exists(loader_json_filepath):
-        with open(loader_json_filepath, "r", encoding="utf-8") as loader_json_file:
-            platform_aggregated_metrics_dict["load_metrics"] = json.load(loader_json_file)
+    loader_json = os.path.join(results_dir, f"{platform}_load.json")
+    if os.path.exists(loader_json):
+        with open(loader_json, "r", encoding="utf-8") as f:
+            metrics["load_metrics"] = json.load(f)
             
-    # Read workload metrics (traversal, lookups, aggregations, mixed)
-    available_workload_types = ["traversal", "lookups", "aggregations", "mixed"]
-    for workload_type_name in available_workload_types:
-        workload_json_filepath = os.path.join(HARNESS_RESULTS_DIRECTORY, f"{platform_identifier_name}_{workload_type_name}.json")
-        if os.path.exists(workload_json_filepath):
-            with open(workload_json_filepath, "r", encoding="utf-8") as workload_json_file:
-                platform_aggregated_metrics_dict["workloads"][workload_type_name] = json.load(workload_json_file)
+    for wl in ["traversal", "lookups", "aggregations", "mixed"]:
+        wl_json = os.path.join(results_dir, f"{platform}_{wl}.json")
+        if os.path.exists(wl_json):
+            with open(wl_json, "r", encoding="utf-8") as f:
+                metrics["workloads"][wl] = json.load(f)
                 
-    return platform_aggregated_metrics_dict
+    return metrics
 
-def generate_consolidated_tabular_csv(consolidated_summary_dictionary):
-    """Flattens the consolidated benchmark metrics into a tabular pandas DataFrame and outputs CSV."""
-    flattened_benchmark_rows_list = []
+def export_summary_csv(summary_data):
+    rows = []
     
-    for platform_key_name, platform_data_dict in consolidated_summary_dictionary.get("platforms", {}).items():
-        platform_display_title = platform_data_dict.get("platform", platform_key_name)
-        load_info = platform_data_dict.get("load_metrics", {})
+    for platform_key, p_data in summary_data.get("platforms", {}).items():
+        load_info = p_data.get("load_metrics", {})
         
-        base_row_entry = {
-            "Platform": platform_display_title,
+        row = {
+            "Platform": p_data.get("platform", platform_key),
             "Nodes_Loaded": load_info.get("nodes_loaded", 0),
             "Relationships_Loaded": load_info.get("relationships_loaded", 0),
             "Batch_Size": load_info.get("batch_size", 0),
@@ -75,83 +64,64 @@ def generate_consolidated_tabular_csv(consolidated_summary_dictionary):
             "Total_Load_Time_Sec": load_info.get("total_load_time_sec", 0.0),
         }
         
-        workloads_info = platform_data_dict.get("workloads", {})
+        workloads = p_data.get("workloads", {})
+        traversal_res = workloads.get("traversal", {}).get("results", {})
         
-        # Extract Traversal Workload Metrics
-        traversal_info = workloads_info.get("traversal", {}).get("results", {})
-        for hop_level_key in ["1_hop", "2_hop", "3_hop"]:
-            hop_metrics = traversal_info.get(hop_level_key, {})
-            base_row_entry[f"Traversal_{hop_level_key}_p50_ms"] = hop_metrics.get("p50_latency_ms", None)
-            base_row_entry[f"Traversal_{hop_level_key}_p95_ms"] = hop_metrics.get("p95_latency_ms", None)
+        for hop in ["1_hop", "2_hop", "3_hop"]:
+            hop_data = traversal_res.get(hop, {})
+            row[f"Traversal_{hop}_p50_ms"] = hop_data.get("p50_latency_ms", None)
+            row[f"Traversal_{hop}_p95_ms"] = hop_data.get("p95_latency_ms", None)
             
-        flattened_benchmark_rows_list.append(base_row_entry)
+        rows.append(row)
         
-    summary_dataframe_table = pd.DataFrame(flattened_benchmark_rows_list)
-    summary_dataframe_table.to_csv(CONSOLIDATED_SUMMARY_CSV_PATH, index=False)
-    return len(summary_dataframe_table)
+    df = pd.DataFrame(rows)
+    df.to_csv(summary_csv, index=False)
+    return len(df)
 
-def run_benchmark_orchestrator_suite():
-    """Main orchestration loop to run loaders, warm-up pass, and workloads for all target platforms."""
+def main():
     print("==================================================", flush=True)
-    print("       WEXA AI — CognoDB Benchmark Orchestrator    ", flush=True)
+    print("       WEXA AI — CognoDB Benchmark Harness        ", flush=True)
     print("==================================================", flush=True)
-    print(f"Target Platforms Configured: {TARGET_PLATFORMS_CONFIG_LIST}", flush=True)
     
-    all_platforms_summary_dictionary = {"platforms": {}}
+    summary = {"platforms": {}}
     
-    for platform_name_item in TARGET_PLATFORMS_CONFIG_LIST:
-        print(f"\n==================================================", flush=True)
-        print(f"       Processing Platform: {platform_name_item.upper()} ", flush=True)
-        print("==================================================", flush=True)
+    for platform in PLATFORMS:
+        print(f"\n---> Platform: {platform.upper()}", flush=True)
         
-        # 1. Run Data Loader
-        loader_script_file_path = os.path.join(LOADERS_DIRECTORY_PATH, f"{platform_name_item}_loader.py")
-        if os.path.exists(loader_script_file_path):
-            loader_success, _ = execute_python_subprocess_module(
-                loader_script_file_path, 
-                f"{platform_name_item.upper()} Data Loader"
-            )
-            if not loader_success:
-                print(f"[Warning] Skipping workloads for {platform_name_item} due to loader failure.", flush=True)
+        loader_script = os.path.join(loaders_dir, f"{platform}_loader.py")
+        if os.path.exists(loader_script):
+            success, _ = run_subprocess(loader_script, f"{platform.upper()} Loader")
+            if not success:
+                print(f"Skipping workloads for {platform} due to loader error.", flush=True)
                 continue
         else:
-            print(f"[Notice] Loader script not found at {loader_script_file_path}. Skipping loader execution.", flush=True)
+            print(f"Loader script not found for {platform}. Skipping loader.", flush=True)
             
-        # 2. Run Workload Scripts (traversal, lookups, aggregations, mixed)
-        supported_workloads_list = [
-            ("traversal", os.path.join(WORKLOADS_DIRECTORY_PATH, "traversal.py")),
-            ("lookups", os.path.join(WORKLOADS_DIRECTORY_PATH, "lookups.py")),
-            ("aggregations", os.path.join(WORKLOADS_DIRECTORY_PATH, "aggregations.py")),
-            ("mixed", os.path.join(WORKLOADS_DIRECTORY_PATH, "mixed.py"))
+        workloads = [
+            ("traversal", os.path.join(workloads_dir, "traversal.py")),
+            ("lookups", os.path.join(workloads_dir, "lookups.py")),
+            ("aggregations", os.path.join(workloads_dir, "aggregations.py")),
+            ("mixed", os.path.join(workloads_dir, "mixed.py"))
         ]
         
-        for workload_name_key, workload_script_file_path in supported_workloads_list:
-            if os.path.exists(workload_script_file_path):
-                execute_python_subprocess_module(
-                    workload_script_file_path, 
-                    f"{platform_name_item.upper()} {workload_name_key.capitalize()} Workload"
-                )
+        for name, script in workloads:
+            if os.path.exists(script):
+                run_subprocess(script, f"{platform.upper()} {name.capitalize()}")
             else:
-                print(f"[Notice] Workload script '{workload_name_key}.py' not implemented yet. Skipping.", flush=True)
+                print(f"Workload '{name}.py' not implemented yet. Skipping.", flush=True)
                 
-        # 3. Aggregate Platform Benchmark Results
-        platform_metrics_data = aggregate_platform_benchmark_results(platform_name_item)
-        all_platforms_summary_dictionary["platforms"][platform_name_item] = platform_metrics_data
+        summary["platforms"][platform] = collect_results(platform)
         
-    # Write Consolidated Summary JSON
-    os.makedirs(HARNESS_RESULTS_DIRECTORY, exist_ok=True)
-    with open(CONSOLIDATED_SUMMARY_JSON_PATH, "w", encoding="utf-8") as summary_json_file:
-        json.dump(all_platforms_summary_dictionary, summary_json_file, indent=4)
+    os.makedirs(results_dir, exist_ok=True)
+    with open(summary_json, "w", encoding="utf-8") as f:
+        json.dump(summary, f, indent=4)
         
-    # Write Consolidated Summary CSV
-    csv_rows_count = generate_consolidated_tabular_csv(all_platforms_summary_dictionary)
+    count = export_summary_csv(summary)
     
     print("\n==================================================", flush=True)
-    print("      Orchestration Suite Execution Complete       ", flush=True)
-    print("==================================================", flush=True)
-    print(f"Summary JSON Generated: {CONSOLIDATED_SUMMARY_JSON_PATH}", flush=True)
-    print(f"Summary CSV Generated:  {CONSOLIDATED_SUMMARY_CSV_PATH} ({csv_rows_count} rows)", flush=True)
+    print(f"Summary JSON: {summary_json}")
+    print(f"Summary CSV:  {summary_csv} ({count} row)")
     print("==================================================\n", flush=True)
 
 if __name__ == "__main__":
-    run_benchmark_orchestrator_suite()
+    main()

@@ -3,9 +3,9 @@
     "nodes_loaded": 91489,
     "relationships_loaded": 200000,
     "batch_size": 1000,
-    "nodes_per_sec": 2547.94,
-    "relationships_per_sec": 3034.11,
-    "total_load_time_sec": 102.88,
-    "node_load_time_sec": 35.91,
-    "relationship_load_time_sec": 65.92
+    "nodes_per_sec": 2789.54,
+    "relationships_per_sec": 3262.15,
+    "total_load_time_sec": 94.81,
+    "node_load_time_sec": 32.8,
+    "relationship_load_time_sec": 61.31
 }

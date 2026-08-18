@@ -1,0 +1,31 @@
+{
+    "platform": "CognoDB",
+    "workload": "lookups",
+    "indexed_properties": [
+        "User(id)"
+    ],
+    "iterations": 100,
+    "warmup_iterations": 15,
+    "results": {
+        "point_lookup": {
+            "p50_latency_ms": 306.89,
+            "p95_latency_ms": 331.65,
+            "mean_latency_ms": 306.13,
+            "min_latency_ms": 278.16,
+            "max_latency_ms": 397.44,
+            "server_engine_p50_ms": 0.0,
+            "server_engine_p95_ms": 0.0,
+            "server_engine_mean_ms": 0.0
+        },
+        "indexed_filtered_lookup": {
+            "p50_latency_ms": 307.32,
+            "p95_latency_ms": 360.29,
+            "mean_latency_ms": 311.36,
+            "min_latency_ms": 279.02,
+            "max_latency_ms": 399.42,
+            "server_engine_p50_ms": 0.0,
+            "server_engine_p95_ms": 0.0,
+            "server_engine_mean_ms": 0.0
+        }
+    }
+}

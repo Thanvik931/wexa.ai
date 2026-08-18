@@ -5,152 +5,136 @@ import pandas as pd
 from dotenv import load_dotenv
 from neo4j import GraphDatabase, exceptions
 
-# Load environment variable settings from .env file
 load_dotenv()
 
-# Non-default, descriptive environment configuration variables
-COGNODB_CONNECTION_ENDPOINT_URI = os.getenv("COGNODB_URI")
-COGNODB_ADMIN_USERNAME = os.getenv("COGNODB_USER")
-COGNODB_ADMIN_PASSWORD = os.getenv("COGNODB_PASSWORD")
-DEFAULT_BATCH_CHUNK_SIZE = 1000
-MAX_TRANSIENT_RETRY_ATTEMPTS = 5
+uri = os.getenv("COGNODB_URI")
+user = os.getenv("COGNODB_USER")
+password = os.getenv("COGNODB_PASSWORD")
 
-SCRIPT_LOCATION_DIRECTORY = os.path.dirname(os.path.abspath(__file__))
-PROJECT_ROOT_DIRECTORY = os.path.abspath(os.path.join(SCRIPT_LOCATION_DIRECTORY, ".."))
-NODES_CSV_SOURCE_FILEPATH = os.path.join(PROJECT_ROOT_DIRECTORY, "data", "nodes.csv")
-EDGES_CSV_SOURCE_FILEPATH = os.path.join(PROJECT_ROOT_DIRECTORY, "data", "edges.csv")
-HARNESS_RESULTS_DIRECTORY = os.path.join(PROJECT_ROOT_DIRECTORY, "harness", "results")
-COGNODB_LOAD_METRICS_JSON_PATH = os.path.join(HARNESS_RESULTS_DIRECTORY, "cognodb_load.json")
+DEFAULT_BATCH_SIZE = 1000
+MAX_RETRIES = 5
 
-def create_database_driver_instance(uri_endpoint_address, user_credentials_tuple):
-    """Establishes driver connection instance to CognoDB GraphDatabase."""
-    return GraphDatabase.driver(uri_endpoint_address, auth=user_credentials_tuple)
+base_dir = os.path.dirname(os.path.abspath(__file__))
+project_root = os.path.abspath(os.path.join(base_dir, ".."))
+nodes_csv = os.path.join(project_root, "data", "nodes.csv")
+edges_csv = os.path.join(project_root, "data", "edges.csv")
+results_dir = os.path.join(project_root, "harness", "results")
+metrics_json = os.path.join(results_dir, "cognodb_load.json")
 
-def execute_cypher_query_with_retry(neo4j_driver_instance, cypher_statement_text, query_parameters_dict=None, max_retry_limit=MAX_TRANSIENT_RETRY_ATTEMPTS):
-    """Executes a Cypher query with automatic exponential backoff retry for transient network/DB errors."""
-    for current_attempt_number in range(1, max_retry_limit + 1):
+def get_driver(uri_str, auth_tuple):
+    return GraphDatabase.driver(uri_str, auth=auth_tuple)
+
+def run_query_retry(driver, cypher, params=None, retries=MAX_RETRIES):
+    for attempt in range(1, retries + 1):
         try:
-            with neo4j_driver_instance.session() as active_database_session:
-                active_database_session.run(cypher_statement_text, query_parameters_dict or {})
+            with driver.session() as session:
+                session.run(cypher, params or {})
                 return
-        except (exceptions.ServiceUnavailable, exceptions.SessionExpired, exceptions.TransientError) as transient_connection_error:
-            if current_attempt_number == max_retry_limit:
-                raise transient_connection_error
-            exponential_backoff_seconds = 2 ** current_attempt_number
-            print(f"[Retry Warning] Transient DB error: {transient_connection_error}. Retrying attempt {current_attempt_number}/{max_retry_limit} after {exponential_backoff_seconds}s...", flush=True)
-            time.sleep(exponential_backoff_seconds)
+        except (exceptions.ServiceUnavailable, exceptions.SessionExpired, exceptions.TransientError) as err:
+            if attempt == retries:
+                raise err
+            wait_time = 2 ** attempt
+            print(f"[Retry] Transient error: {err}. Retrying ({attempt}/{retries}) in {wait_time}s...", flush=True)
+            time.sleep(wait_time)
 
-def prepare_database_schema_indexing(neo4j_driver_instance):
-    """Creates index on User(id) to ensure ultra-fast relationship link lookups."""
-    print("Preparing schema index on User(id) for fast edge resolution...", flush=True)
-    create_index_cypher = "CREATE INDEX user_id_lookup_idx IF NOT EXISTS FOR (user_node:User) ON (user_node.id)"
+def ensure_indexes(driver):
+    print("Setting up index on User(id)...", flush=True)
+    cypher = "CREATE INDEX user_id_lookup_idx IF NOT EXISTS FOR (u:User) ON (u.id)"
     try:
-        execute_cypher_query_with_retry(neo4j_driver_instance, create_index_cypher)
-    except Exception as index_creation_exception:
-        print(f"[Index Notice] Schema index statement result: {index_creation_exception}", flush=True)
+        run_query_retry(driver, cypher)
+    except Exception as e:
+        print(f"[Index Notice] {e}", flush=True)
 
-def ingest_node_records_in_batches(neo4j_driver_instance, nodes_dataset_dataframe, batch_size_chunk):
-    """Loads nodes into CognoDB using batched UNWIND Cypher queries."""
-    node_records_dictionary_list = nodes_dataset_dataframe.to_dict(orient="records")
-    total_nodes_to_process = len(node_records_dictionary_list)
-    print(f"Ingesting {total_nodes_to_process:,} nodes in batches of {batch_size_chunk:,}...", flush=True)
+def load_nodes(driver, df, batch_size):
+    records = df.to_dict(orient="records")
+    total = len(records)
+    print(f"Loading {total:,} nodes in batches of {batch_size:,}...", flush=True)
     
-    batched_node_cypher_query = """
-    UNWIND $batch_records AS node_item
-    MERGE (user_node:User {id: node_item.id})
-    SET user_node.label = node_item.label
+    cypher = """
+    UNWIND $batch AS row
+    MERGE (u:User {id: row.id})
+    SET u.label = row.label
     """
     
-    node_ingestion_start_time = time.perf_counter()
-    for batch_offset_index in range(0, total_nodes_to_process, batch_size_chunk):
-        current_node_batch_chunk = node_records_dictionary_list[batch_offset_index : batch_offset_index + batch_size_chunk]
-        execute_cypher_query_with_retry(neo4j_driver_instance, batched_node_cypher_query, {"batch_records": current_node_batch_chunk})
+    start_time = time.perf_counter()
+    for i in range(0, total, batch_size):
+        chunk = records[i : i + batch_size]
+        run_query_retry(driver, cypher, {"batch": chunk})
     
-    node_ingestion_total_duration = time.perf_counter() - node_ingestion_start_time
-    return node_ingestion_total_duration
+    return time.perf_counter() - start_time
 
-def ingest_relationship_records_in_batches(neo4j_driver_instance, edges_dataset_dataframe, batch_size_chunk):
-    """Loads relationships into CognoDB using batched UNWIND Cypher queries."""
-    edge_records_dictionary_list = edges_dataset_dataframe.to_dict(orient="records")
-    total_edges_to_process = len(edge_records_dictionary_list)
-    print(f"Ingesting {total_edges_to_process:,} relationships in batches of {batch_size_chunk:,}...", flush=True)
+def load_edges(driver, df, batch_size):
+    records = df.to_dict(orient="records")
+    total = len(records)
+    print(f"Loading {total:,} relationships in batches of {batch_size:,}...", flush=True)
     
-    batched_edge_cypher_query = """
-    UNWIND $batch_records AS edge_item
-    MATCH (source_user_node:User {id: edge_item.source})
-    MATCH (target_user_node:User {id: edge_item.target})
-    MERGE (source_user_node)-[friend_relationship:FRIEND_OF]->(target_user_node)
+    cypher = """
+    UNWIND $batch AS row
+    MATCH (src:User {id: row.source})
+    MATCH (tgt:User {id: row.target})
+    MERGE (src)-[r:FRIEND_OF]->(tgt)
     """
     
-    edge_ingestion_start_time = time.perf_counter()
-    for batch_offset_index in range(0, total_edges_to_process, batch_size_chunk):
-        current_edge_batch_chunk = edge_records_dictionary_list[batch_offset_index : batch_offset_index + batch_size_chunk]
-        execute_cypher_query_with_retry(neo4j_driver_instance, batched_edge_cypher_query, {"batch_records": current_edge_batch_chunk})
+    start_time = time.perf_counter()
+    for i in range(0, total, batch_size):
+        chunk = records[i : i + batch_size]
+        run_query_retry(driver, cypher, {"batch": chunk})
     
-    edge_ingestion_total_duration = time.perf_counter() - edge_ingestion_start_time
-    return edge_ingestion_total_duration
+    return time.perf_counter() - start_time
 
-def execute_cognodb_benchmark_data_loader(custom_batch_chunk_size=DEFAULT_BATCH_CHUNK_SIZE):
-    """Main execution function to orchestrate CognoDB data ingestion and benchmark timing."""
-    if not COGNODB_CONNECTION_ENDPOINT_URI or not COGNODB_ADMIN_USERNAME or not COGNODB_ADMIN_PASSWORD:
-        raise ValueError("Missing required CognoDB credentials in environment variables (COGNODB_URI, COGNODB_USER, COGNODB_PASSWORD)")
+def main(batch_size=DEFAULT_BATCH_SIZE):
+    if not uri or not user or not password:
+        raise ValueError("Missing CogODB credentials in environment (.env).")
     
-    print("Reading dataset CSV files from data directory...", flush=True)
-    nodes_dataset_df = pd.read_csv(NODES_CSV_SOURCE_FILEPATH)
-    edges_dataset_df = pd.read_csv(EDGES_CSV_SOURCE_FILEPATH)
+    print("Reading data CSVs...", flush=True)
+    nodes_df = pd.read_csv(nodes_csv)
+    edges_df = pd.read_csv(edges_csv)
     
-    nodes_quantity = len(nodes_dataset_df)
-    edges_quantity = len(edges_dataset_df)
-    print(f"Dataset loaded successfully: {nodes_quantity:,} nodes and {edges_quantity:,} edges.", flush=True)
+    node_count = len(nodes_df)
+    edge_count = len(edges_df)
+    print(f"Loaded {node_count:,} nodes and {edge_count:,} edges.", flush=True)
     
-    print(f"Connecting to CognoDB endpoint: {COGNODB_CONNECTION_ENDPOINT_URI}...", flush=True)
-    cognodb_driver_connection = create_database_driver_instance(
-        COGNODB_CONNECTION_ENDPOINT_URI, 
-        (COGNODB_ADMIN_USERNAME, COGNODB_ADMIN_PASSWORD)
-    )
-    cognodb_driver_connection.verify_connectivity()
-    print("Successfully connected to CognoDB instance.", flush=True)
+    print(f"Connecting to CognoDB ({uri})...", flush=True)
+    driver = get_driver(uri, (user, password))
+    driver.verify_connectivity()
+    print("Connected successfully.", flush=True)
     
-    prepare_database_schema_indexing(cognodb_driver_connection)
+    ensure_indexes(driver)
     
-    total_benchmark_start_timer = time.perf_counter()
+    start_all = time.perf_counter()
     
-    nodes_ingestion_elapsed_sec = ingest_node_records_in_batches(cognodb_driver_connection, nodes_dataset_df, custom_batch_chunk_size)
-    edges_ingestion_elapsed_sec = ingest_relationship_records_in_batches(cognodb_driver_connection, edges_dataset_df, custom_batch_chunk_size)
+    node_time = load_nodes(driver, nodes_df, batch_size)
+    edge_time = load_edges(driver, edges_df, batch_size)
     
-    total_benchmark_elapsed_sec = time.perf_counter() - total_benchmark_start_timer
-    cognodb_driver_connection.close()
+    total_time = time.perf_counter() - start_all
+    driver.close()
     
-    nodes_per_second_rate = nodes_quantity / nodes_ingestion_elapsed_sec if nodes_ingestion_elapsed_sec > 0 else 0
-    relationships_per_second_rate = edges_quantity / edges_ingestion_elapsed_sec if edges_ingestion_elapsed_sec > 0 else 0
+    nodes_per_sec = node_count / node_time if node_time > 0 else 0
+    edges_per_sec = edge_count / edge_time if edge_time > 0 else 0
     
-    benchmark_results_telemetry = {
+    metrics = {
         "platform": "CognoDB",
-        "nodes_loaded": nodes_quantity,
-        "relationships_loaded": edges_quantity,
-        "batch_size": custom_batch_chunk_size,
-        "nodes_per_sec": round(nodes_per_second_rate, 2),
-        "relationships_per_sec": round(relationships_per_second_rate, 2),
-        "total_load_time_sec": round(total_benchmark_elapsed_sec, 2),
-        "node_load_time_sec": round(nodes_ingestion_elapsed_sec, 2),
-        "relationship_load_time_sec": round(edges_ingestion_elapsed_sec, 2)
+        "nodes_loaded": node_count,
+        "relationships_loaded": edge_count,
+        "batch_size": batch_size,
+        "nodes_per_sec": round(nodes_per_sec, 2),
+        "relationships_per_sec": round(edges_per_sec, 2),
+        "total_load_time_sec": round(total_time, 2),
+        "node_load_time_sec": round(node_time, 2),
+        "relationship_load_time_sec": round(edge_time, 2)
     }
     
-    os.makedirs(HARNESS_RESULTS_DIRECTORY, exist_ok=True)
-    with open(COGNODB_LOAD_METRICS_JSON_PATH, "w", encoding="utf-8") as metrics_json_file:
-        json.dump(benchmark_results_telemetry, metrics_json_file, indent=4)
+    os.makedirs(results_dir, exist_ok=True)
+    with open(metrics_json, "w", encoding="utf-8") as f:
+        json.dump(metrics, f, indent=4)
         
-    print("\n==================================================", flush=True)
-    print("           CognoDB Data Loader Summary            ", flush=True)
-    print("==================================================", flush=True)
-    print(f"Nodes Loaded:          {nodes_quantity:,}", flush=True)
-    print(f"Relationships Loaded:  {edges_quantity:,}", flush=True)
-    print(f"Batch Size:            {custom_batch_chunk_size:,}", flush=True)
-    print(f"Nodes / Sec:           {nodes_per_second_rate:,.2f}", flush=True)
-    print(f"Relationships / Sec:   {relationships_per_second_rate:,.2f}", flush=True)
-    print(f"Total Load Time:       {total_benchmark_elapsed_sec:.2f} seconds", flush=True)
-    print(f"Results File:          {COGNODB_LOAD_METRICS_JSON_PATH}", flush=True)
-    print("==================================================\n", flush=True)
+    print("\n--- CognoDB Load Summary ---")
+    print(f"Nodes Loaded:        {node_count:,}")
+    print(f"Edges Loaded:        {edge_count:,}")
+    print(f"Nodes / sec:         {nodes_per_sec:,.2f}")
+    print(f"Edges / sec:         {edges_per_sec:,.2f}")
+    print(f"Total Load Time:     {total_time:.2f}s")
+    print(f"Saved Results:       {metrics_json}\n")
 
 if __name__ == "__main__":
-    execute_cognodb_benchmark_data_loader()
+    main()

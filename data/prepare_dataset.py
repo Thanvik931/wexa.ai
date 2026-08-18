@@ -4,79 +4,70 @@ import urllib.request
 import pandas as pd
 
 DATASET_URL = "https://snap.stanford.edu/data/soc-pokec-relationships.txt.gz"
-DATASET_LICENSE = "Public Domain / SNAP Dataset for Academic Research (Stanford University)"
-TARGET_RELATIONSHIPS = 200000  # 200,000 relationships (100k - 500k range)
+DATASET_LICENSE = "Public Domain / SNAP Dataset (Stanford University)"
+TARGET_EDGES = 200000
 
-SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
-DATA_DIR = SCRIPT_DIR
-GZ_FILE_PATH = os.path.join(DATA_DIR, "soc-pokec-relationships.txt.gz")
-NODES_CSV_PATH = os.path.join(DATA_DIR, "nodes.csv")
-EDGES_CSV_PATH = os.path.join(DATA_DIR, "edges.csv")
+base_dir = os.path.dirname(os.path.abspath(__file__))
+gz_path = os.path.join(base_dir, "soc-pokec-relationships.txt.gz")
+nodes_csv = os.path.join(base_dir, "nodes.csv")
+edges_csv = os.path.join(base_dir, "edges.csv")
 
-def download_dataset(url, dest_path):
-    if not os.path.exists(dest_path) or os.path.getsize(dest_path) == 0:
+def download_data(url, target_file):
+    if not os.path.exists(target_file) or os.path.getsize(target_file) == 0:
         print(f"Downloading dataset from {url}...", flush=True)
-        req = urllib.request.Request(
-            url, 
-            headers={"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"}
-        )
-        with urllib.request.urlopen(req) as response, open(dest_path, "wb") as out_file:
-            chunk_size = 1024 * 1024
+        headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"}
+        req = urllib.request.Request(url, headers=headers)
+        with urllib.request.urlopen(req) as resp, open(target_file, "wb") as f_out:
             while True:
-                chunk = response.read(chunk_size)
+                chunk = resp.read(1024 * 1024)
                 if not chunk:
                     break
-                out_file.write(chunk)
-        print("Download complete.", flush=True)
+                f_out.write(chunk)
+        print("Download finished.", flush=True)
     else:
-        print(f"Dataset archive already present at {dest_path} ({os.path.getsize(dest_path):,} bytes)", flush=True)
+        print(f"Dataset archive already present ({os.path.getsize(target_file):,} bytes).", flush=True)
 
-def process_and_save(gz_path, num_edges):
-    print(f"Processing dataset up to {num_edges:,} relationships...", flush=True)
-    edges = []
-    nodes = set()
+def process_graph_data(archive_path, max_edges):
+    print(f"Extracting up to {max_edges:,} edges...", flush=True)
+    edge_list = []
+    node_set = set()
 
-    with gzip.open(gz_path, "rt", encoding="utf-8") as f:
-        for line in f:
+    with gzip.open(archive_path, "rt", encoding="utf-8") as f_in:
+        for line in f_in:
             line = line.strip()
             if not line or line.startswith("#"):
                 continue
-            parts = line.split("\t")
-            if len(parts) >= 2:
-                src, tgt = int(parts[0]), int(parts[1])
-                edges.append((src, tgt))
-                nodes.add(src)
-                nodes.add(tgt)
-                if len(edges) >= num_edges:
+            tokens = line.split("\t")
+            if len(tokens) >= 2:
+                src, tgt = int(tokens[0]), int(tokens[1])
+                edge_list.append((src, tgt))
+                node_set.add(src)
+                node_set.add(tgt)
+                if len(edge_list) >= max_edges:
                     break
 
-    print(f"Writing {len(edges):,} edges to {EDGES_CSV_PATH}...", flush=True)
-    df_edges = pd.DataFrame(edges, columns=["source", "target"])
-    df_edges["type"] = "FRIEND_OF"
-    df_edges.to_csv(EDGES_CSV_PATH, index=False)
+    edges_df = pd.DataFrame(edge_list, columns=["source", "target"])
+    edges_df["type"] = "FRIEND_OF"
+    edges_df.to_csv(edges_csv, index=False)
 
-    print(f"Writing {len(nodes):,} nodes to {NODES_CSV_PATH} (preserving referential integrity)...", flush=True)
-    df_nodes = pd.DataFrame(sorted(list(nodes)), columns=["id"])
-    df_nodes["label"] = "User"
-    df_nodes.to_csv(NODES_CSV_PATH, index=False)
+    nodes_df = pd.DataFrame(sorted(node_set), columns=["id"])
+    nodes_df["label"] = "User"
+    nodes_df.to_csv(nodes_csv, index=False)
 
-    return len(df_nodes), len(df_edges)
+    return len(nodes_df), len(edges_df)
 
 def main():
-    os.makedirs(DATA_DIR, exist_ok=True)
-    download_dataset(DATASET_URL, GZ_FILE_PATH)
-    node_count, edge_count = process_and_save(GZ_FILE_PATH, TARGET_RELATIONSHIPS)
+    os.makedirs(base_dir, exist_ok=True)
+    download_data(DATASET_URL, gz_path)
+    total_nodes, total_edges = process_graph_data(gz_path, TARGET_EDGES)
 
-    print("\n==================================================", flush=True)
-    print("        Dataset Acquisition & Prep Summary        ", flush=True)
-    print("==================================================", flush=True)
-    print(f"Source URL:         {DATASET_URL}", flush=True)
-    print(f"License:            {DATASET_LICENSE}", flush=True)
-    print(f"Exact Node Count:   {node_count:,}", flush=True)
-    print(f"Relationship Count: {edge_count:,}", flush=True)
-    print(f"Nodes File:         {NODES_CSV_PATH}", flush=True)
-    print(f"Edges File:         {EDGES_CSV_PATH}", flush=True)
-    print("==================================================\n", flush=True)
+    print("\n--- Dataset Summary ---")
+    print(f"Source URL:   {DATASET_URL}")
+    print(f"License:      {DATASET_LICENSE}")
+    print(f"Node Count:   {total_nodes:,}")
+    print(f"Edge Count:   {total_edges:,}")
+    print(f"Nodes File:   {nodes_csv}")
+    print(f"Edges File:   {edges_csv}\n")
 
 if __name__ == "__main__":
     main()
