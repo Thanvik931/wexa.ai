@@ -1,0 +1,11 @@
+{
+    "platform": "Kuzudb",
+    "nodes_loaded": 91489,
+    "relationships_loaded": 200000,
+    "batch_size": 1000,
+    "nodes_per_sec": 4520.8,
+    "relationships_per_sec": 5100.2,
+    "total_load_time_sec": 59.45,
+    "node_load_time_sec": 20.24,
+    "relationship_load_time_sec": 39.21
+}

@@ -1,0 +1,11 @@
+{
+    "platform": "Neo4j",
+    "nodes_loaded": 91489,
+    "relationships_loaded": 200000,
+    "batch_size": 1000,
+    "nodes_per_sec": 1845.2,
+    "relationships_per_sec": 1920.45,
+    "total_load_time_sec": 153.72,
+    "node_load_time_sec": 49.58,
+    "relationship_load_time_sec": 104.14
+}

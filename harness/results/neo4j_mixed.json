@@ -1,0 +1,32 @@
+{
+    "platform": "Neo4j",
+    "workload": "mixed",
+    "read_ratio": 0.8,
+    "write_ratio": 0.2,
+    "sweeps": {
+        "workers_1": {
+            "concurrent_workers": 1,
+            "duration_sec": 10.0,
+            "total_operations": 31,
+            "throughput_qps": 3.1,
+            "p50_latency_ms": 310.2,
+            "p95_latency_ms": 420.5
+        },
+        "workers_10": {
+            "concurrent_workers": 10,
+            "duration_sec": 10.0,
+            "total_operations": 285,
+            "throughput_qps": 28.5,
+            "p50_latency_ms": 330.4,
+            "p95_latency_ms": 480.1
+        },
+        "workers_40": {
+            "concurrent_workers": 40,
+            "duration_sec": 10.0,
+            "total_operations": 760,
+            "throughput_qps": 76.0,
+            "p50_latency_ms": 395.8,
+            "p95_latency_ms": 1180.4
+        }
+    }
+}

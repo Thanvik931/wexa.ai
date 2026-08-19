@@ -1,0 +1,22 @@
+{
+    "platform": "Memgraph",
+    "workload": "aggregations",
+    "iterations": 100,
+    "warmup_iterations": 15,
+    "results": {
+        "label_count_group_by": {
+            "p50_latency_ms": 320.1,
+            "p95_latency_ms": 410.5,
+            "mean_latency_ms": 335.8,
+            "min_latency_ms": 295.2,
+            "max_latency_ms": 920.4
+        },
+        "node_out_degree_aggregation": {
+            "p50_latency_ms": 190.4,
+            "p95_latency_ms": 255.8,
+            "mean_latency_ms": 202.1,
+            "min_latency_ms": 178.1,
+            "max_latency_ms": 680.2
+        }
+    }
+}

@@ -1,0 +1,25 @@
+{
+    "platform": "Kuzudb",
+    "workload": "lookups",
+    "indexed_properties": [
+        "User(id)"
+    ],
+    "iterations": 100,
+    "warmup_iterations": 15,
+    "results": {
+        "point_lookup": {
+            "p50_latency_ms": 112.5,
+            "p95_latency_ms": 158.2,
+            "mean_latency_ms": 122.4,
+            "min_latency_ms": 98.4,
+            "max_latency_ms": 380.1
+        },
+        "indexed_filtered_lookup": {
+            "p50_latency_ms": 108.4,
+            "p95_latency_ms": 152.1,
+            "mean_latency_ms": 118.5,
+            "min_latency_ms": 95.2,
+            "max_latency_ms": 360.4
+        }
+    }
+}

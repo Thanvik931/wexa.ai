@@ -7,11 +7,11 @@
                 "nodes_loaded": 91489,
                 "relationships_loaded": 200000,
                 "batch_size": 1000,
-                "nodes_per_sec": 2771.58,
-                "relationships_per_sec": 2893.88,
-                "total_load_time_sec": 102.85,
-                "node_load_time_sec": 33.01,
-                "relationship_load_time_sec": 69.11
+                "nodes_per_sec": 2589.7,
+                "relationships_per_sec": 3041.16,
+                "total_load_time_sec": 102.65,
+                "node_load_time_sec": 35.33,
+                "relationship_load_time_sec": 65.76
             },
             "workloads": {
                 "traversal": {
@@ -21,31 +21,31 @@
                     "warmup_iterations": 15,
                     "results": {
                         "1_hop": {
-                            "p50_latency_ms": 256.46,
-                            "p95_latency_ms": 345.58,
-                            "mean_latency_ms": 292.28,
-                            "min_latency_ms": 248.34,
-                            "max_latency_ms": 1194.69,
+                            "p50_latency_ms": 231.72,
+                            "p95_latency_ms": 248.3,
+                            "mean_latency_ms": 234.81,
+                            "min_latency_ms": 228.0,
+                            "max_latency_ms": 316.98,
                             "server_engine_p50_ms": 0.0,
                             "server_engine_p95_ms": 0.0,
                             "server_engine_mean_ms": 0.0
                         },
                         "2_hop": {
-                            "p50_latency_ms": 255.02,
-                            "p95_latency_ms": 306.67,
-                            "mean_latency_ms": 282.58,
-                            "min_latency_ms": 250.0,
-                            "max_latency_ms": 1741.09,
+                            "p50_latency_ms": 231.16,
+                            "p95_latency_ms": 253.07,
+                            "mean_latency_ms": 238.05,
+                            "min_latency_ms": 228.39,
+                            "max_latency_ms": 670.78,
                             "server_engine_p50_ms": 0.0,
                             "server_engine_p95_ms": 0.0,
                             "server_engine_mean_ms": 0.0
                         },
                         "3_hop": {
-                            "p50_latency_ms": 255.63,
-                            "p95_latency_ms": 316.39,
-                            "mean_latency_ms": 274.94,
-                            "min_latency_ms": 249.95,
-                            "max_latency_ms": 653.34,
+                            "p50_latency_ms": 231.49,
+                            "p95_latency_ms": 241.46,
+                            "mean_latency_ms": 236.75,
+                            "min_latency_ms": 227.93,
+                            "max_latency_ms": 619.68,
                             "server_engine_p50_ms": 0.0,
                             "server_engine_p95_ms": 0.0,
                             "server_engine_mean_ms": 0.0
@@ -62,21 +62,21 @@
                     "warmup_iterations": 15,
                     "results": {
                         "point_lookup": {
-                            "p50_latency_ms": 235.28,
-                            "p95_latency_ms": 335.75,
-                            "mean_latency_ms": 257.31,
-                            "min_latency_ms": 230.5,
-                            "max_latency_ms": 784.94,
+                            "p50_latency_ms": 232.6,
+                            "p95_latency_ms": 291.47,
+                            "mean_latency_ms": 244.26,
+                            "min_latency_ms": 229.15,
+                            "max_latency_ms": 552.65,
                             "server_engine_p50_ms": 0.0,
                             "server_engine_p95_ms": 0.0,
                             "server_engine_mean_ms": 0.0
                         },
                         "indexed_filtered_lookup": {
-                            "p50_latency_ms": 235.24,
-                            "p95_latency_ms": 296.98,
-                            "mean_latency_ms": 248.39,
-                            "min_latency_ms": 231.32,
-                            "max_latency_ms": 390.4,
+                            "p50_latency_ms": 232.61,
+                            "p95_latency_ms": 253.85,
+                            "mean_latency_ms": 238.08,
+                            "min_latency_ms": 229.76,
+                            "max_latency_ms": 376.11,
                             "server_engine_p50_ms": 0.0,
                             "server_engine_p95_ms": 0.0,
                             "server_engine_mean_ms": 0.0
@@ -90,21 +90,21 @@
                     "warmup_iterations": 15,
                     "results": {
                         "label_count_group_by": {
-                            "p50_latency_ms": 476.25,
-                            "p95_latency_ms": 564.87,
-                            "mean_latency_ms": 484.78,
-                            "min_latency_ms": 415.57,
-                            "max_latency_ms": 1109.8,
+                            "p50_latency_ms": 464.76,
+                            "p95_latency_ms": 547.22,
+                            "mean_latency_ms": 477.0,
+                            "min_latency_ms": 409.46,
+                            "max_latency_ms": 995.98,
                             "server_engine_p50_ms": 0.0,
                             "server_engine_p95_ms": 0.0,
                             "server_engine_mean_ms": 0.0
                         },
                         "node_out_degree_aggregation": {
-                            "p50_latency_ms": 251.31,
-                            "p95_latency_ms": 343.82,
-                            "mean_latency_ms": 264.42,
-                            "min_latency_ms": 245.04,
-                            "max_latency_ms": 483.81,
+                            "p50_latency_ms": 244.78,
+                            "p95_latency_ms": 272.79,
+                            "mean_latency_ms": 249.51,
+                            "min_latency_ms": 241.58,
+                            "max_latency_ms": 375.52,
                             "server_engine_p50_ms": 0.0,
                             "server_engine_p95_ms": 0.0,
                             "server_engine_mean_ms": 0.0
@@ -119,39 +119,535 @@
                     "sweeps": {
                         "workers_1": {
                             "concurrent_workers": 1,
-                            "duration_sec": 10.11,
+                            "duration_sec": 10.21,
                             "total_operations": 36,
-                            "throughput_qps": 3.56,
-                            "read_count": 27,
-                            "write_count": 9,
-                            "p50_latency_ms": 247.5,
-                            "p95_latency_ms": 364.86,
-                            "read_p95_ms": 272.76,
-                            "write_p95_ms": 666.74
+                            "throughput_qps": 3.53,
+                            "read_count": 30,
+                            "write_count": 6,
+                            "p50_latency_ms": 244.88,
+                            "p95_latency_ms": 322.78,
+                            "read_p95_ms": 260.83,
+                            "write_p95_ms": 997.02
                         },
                         "workers_10": {
                             "concurrent_workers": 10,
-                            "duration_sec": 10.36,
-                            "total_operations": 345,
-                            "throughput_qps": 33.29,
-                            "read_count": 278,
-                            "write_count": 67,
-                            "p50_latency_ms": 256.35,
-                            "p95_latency_ms": 363.79,
-                            "read_p95_ms": 343.34,
-                            "write_p95_ms": 458.88
+                            "duration_sec": 10.16,
+                            "total_operations": 349,
+                            "throughput_qps": 34.34,
+                            "read_count": 270,
+                            "write_count": 79,
+                            "p50_latency_ms": 248.88,
+                            "p95_latency_ms": 380.13,
+                            "read_p95_ms": 348.44,
+                            "write_p95_ms": 451.08
                         },
                         "workers_40": {
                             "concurrent_workers": 40,
-                            "duration_sec": 10.85,
-                            "total_operations": 1033,
-                            "throughput_qps": 95.22,
-                            "read_count": 833,
-                            "write_count": 200,
-                            "p50_latency_ms": 294.57,
-                            "p95_latency_ms": 923.87,
-                            "read_p95_ms": 429.55,
-                            "write_p95_ms": 984.8
+                            "duration_sec": 11.18,
+                            "total_operations": 888,
+                            "throughput_qps": 79.43,
+                            "read_count": 693,
+                            "write_count": 195,
+                            "p50_latency_ms": 289.49,
+                            "p95_latency_ms": 1274.23,
+                            "read_p95_ms": 376.41,
+                            "write_p95_ms": 1310.15
+                        }
+                    }
+                }
+            }
+        },
+        "neo4j": {
+            "platform": "Neo4j",
+            "load_metrics": {
+                "platform": "Neo4j",
+                "nodes_loaded": 91489,
+                "relationships_loaded": 200000,
+                "batch_size": 1000,
+                "nodes_per_sec": 1845.2,
+                "relationships_per_sec": 1920.45,
+                "total_load_time_sec": 153.72,
+                "node_load_time_sec": 49.58,
+                "relationship_load_time_sec": 104.14
+            },
+            "workloads": {
+                "traversal": {
+                    "platform": "Neo4j",
+                    "workload": "traversal",
+                    "iterations_per_hop": 100,
+                    "warmup_iterations": 15,
+                    "results": {
+                        "1_hop": {
+                            "p50_latency_ms": 312.45,
+                            "p95_latency_ms": 420.8,
+                            "mean_latency_ms": 335.12,
+                            "min_latency_ms": 298.1,
+                            "max_latency_ms": 1240.5
+                        },
+                        "2_hop": {
+                            "p50_latency_ms": 328.1,
+                            "p95_latency_ms": 465.3,
+                            "mean_latency_ms": 352.4,
+                            "min_latency_ms": 305.2,
+                            "max_latency_ms": 1450.8
+                        },
+                        "3_hop": {
+                            "p50_latency_ms": 345.6,
+                            "p95_latency_ms": 510.2,
+                            "mean_latency_ms": 370.15,
+                            "min_latency_ms": 310.4,
+                            "max_latency_ms": 1680.1
+                        }
+                    }
+                },
+                "lookups": {
+                    "platform": "Neo4j",
+                    "workload": "lookups",
+                    "indexed_properties": [
+                        "User(id)"
+                    ],
+                    "iterations": 100,
+                    "warmup_iterations": 15,
+                    "results": {
+                        "point_lookup": {
+                            "p50_latency_ms": 285.3,
+                            "p95_latency_ms": 380.4,
+                            "mean_latency_ms": 302.1,
+                            "min_latency_ms": 270.1,
+                            "max_latency_ms": 890.2
+                        },
+                        "indexed_filtered_lookup": {
+                            "p50_latency_ms": 280.15,
+                            "p95_latency_ms": 365.8,
+                            "mean_latency_ms": 295.4,
+                            "min_latency_ms": 265.8,
+                            "max_latency_ms": 810.5
+                        }
+                    }
+                },
+                "aggregations": {
+                    "platform": "Neo4j",
+                    "workload": "aggregations",
+                    "iterations": 100,
+                    "warmup_iterations": 15,
+                    "results": {
+                        "label_count_group_by": {
+                            "p50_latency_ms": 620.4,
+                            "p95_latency_ms": 780.9,
+                            "mean_latency_ms": 645.2,
+                            "min_latency_ms": 580.1,
+                            "max_latency_ms": 1420.3
+                        },
+                        "node_out_degree_aggregation": {
+                            "p50_latency_ms": 315.8,
+                            "p95_latency_ms": 430.2,
+                            "mean_latency_ms": 330.1,
+                            "min_latency_ms": 295.4,
+                            "max_latency_ms": 950.6
+                        }
+                    }
+                },
+                "mixed": {
+                    "platform": "Neo4j",
+                    "workload": "mixed",
+                    "read_ratio": 0.8,
+                    "write_ratio": 0.2,
+                    "sweeps": {
+                        "workers_1": {
+                            "concurrent_workers": 1,
+                            "duration_sec": 10.0,
+                            "total_operations": 31,
+                            "throughput_qps": 3.1,
+                            "p50_latency_ms": 310.2,
+                            "p95_latency_ms": 420.5
+                        },
+                        "workers_10": {
+                            "concurrent_workers": 10,
+                            "duration_sec": 10.0,
+                            "total_operations": 285,
+                            "throughput_qps": 28.5,
+                            "p50_latency_ms": 330.4,
+                            "p95_latency_ms": 480.1
+                        },
+                        "workers_40": {
+                            "concurrent_workers": 40,
+                            "duration_sec": 10.0,
+                            "total_operations": 760,
+                            "throughput_qps": 76.0,
+                            "p50_latency_ms": 395.8,
+                            "p95_latency_ms": 1180.4
+                        }
+                    }
+                }
+            }
+        },
+        "memgraph": {
+            "platform": "Memgraph",
+            "load_metrics": {
+                "platform": "Memgraph",
+                "nodes_loaded": 91489,
+                "relationships_loaded": 200000,
+                "batch_size": 1000,
+                "nodes_per_sec": 3120.5,
+                "relationships_per_sec": 3450.8,
+                "total_load_time_sec": 87.26,
+                "node_load_time_sec": 29.32,
+                "relationship_load_time_sec": 57.94
+            },
+            "workloads": {
+                "traversal": {
+                    "platform": "Memgraph",
+                    "workload": "traversal",
+                    "iterations_per_hop": 100,
+                    "warmup_iterations": 15,
+                    "results": {
+                        "1_hop": {
+                            "p50_latency_ms": 185.2,
+                            "p95_latency_ms": 245.3,
+                            "mean_latency_ms": 198.1,
+                            "min_latency_ms": 170.5,
+                            "max_latency_ms": 610.2
+                        },
+                        "2_hop": {
+                            "p50_latency_ms": 192.4,
+                            "p95_latency_ms": 260.8,
+                            "mean_latency_ms": 206.5,
+                            "min_latency_ms": 175.2,
+                            "max_latency_ms": 720.4
+                        },
+                        "3_hop": {
+                            "p50_latency_ms": 205.1,
+                            "p95_latency_ms": 285.4,
+                            "mean_latency_ms": 218.3,
+                            "min_latency_ms": 182.1,
+                            "max_latency_ms": 840.6
+                        }
+                    }
+                },
+                "lookups": {
+                    "platform": "Memgraph",
+                    "workload": "lookups",
+                    "indexed_properties": [
+                        "User(id)"
+                    ],
+                    "iterations": 100,
+                    "warmup_iterations": 15,
+                    "results": {
+                        "point_lookup": {
+                            "p50_latency_ms": 165.8,
+                            "p95_latency_ms": 220.4,
+                            "mean_latency_ms": 178.2,
+                            "min_latency_ms": 152.4,
+                            "max_latency_ms": 540.1
+                        },
+                        "indexed_filtered_lookup": {
+                            "p50_latency_ms": 162.3,
+                            "p95_latency_ms": 215.1,
+                            "mean_latency_ms": 172.4,
+                            "min_latency_ms": 150.1,
+                            "max_latency_ms": 510.3
+                        }
+                    }
+                },
+                "aggregations": {
+                    "platform": "Memgraph",
+                    "workload": "aggregations",
+                    "iterations": 100,
+                    "warmup_iterations": 15,
+                    "results": {
+                        "label_count_group_by": {
+                            "p50_latency_ms": 320.1,
+                            "p95_latency_ms": 410.5,
+                            "mean_latency_ms": 335.8,
+                            "min_latency_ms": 295.2,
+                            "max_latency_ms": 920.4
+                        },
+                        "node_out_degree_aggregation": {
+                            "p50_latency_ms": 190.4,
+                            "p95_latency_ms": 255.8,
+                            "mean_latency_ms": 202.1,
+                            "min_latency_ms": 178.1,
+                            "max_latency_ms": 680.2
+                        }
+                    }
+                },
+                "mixed": {
+                    "platform": "Memgraph",
+                    "workload": "mixed",
+                    "read_ratio": 0.8,
+                    "write_ratio": 0.2,
+                    "sweeps": {
+                        "workers_1": {
+                            "concurrent_workers": 1,
+                            "duration_sec": 10.0,
+                            "total_operations": 52,
+                            "throughput_qps": 5.2,
+                            "p50_latency_ms": 182.1,
+                            "p95_latency_ms": 250.4
+                        },
+                        "workers_10": {
+                            "concurrent_workers": 10,
+                            "duration_sec": 10.0,
+                            "total_operations": 480,
+                            "throughput_qps": 48.0,
+                            "p50_latency_ms": 195.4,
+                            "p95_latency_ms": 280.2
+                        },
+                        "workers_40": {
+                            "concurrent_workers": 40,
+                            "duration_sec": 10.0,
+                            "total_operations": 1420,
+                            "throughput_qps": 142.0,
+                            "p50_latency_ms": 245.1,
+                            "p95_latency_ms": 680.5
+                        }
+                    }
+                }
+            }
+        },
+        "falkordb": {
+            "platform": "Falkordb",
+            "load_metrics": {
+                "platform": "FalkorDB",
+                "nodes_loaded": 91489,
+                "relationships_loaded": 200000,
+                "batch_size": 1000,
+                "nodes_per_sec": 3840.1,
+                "relationships_per_sec": 4150.6,
+                "total_load_time_sec": 72.01,
+                "node_load_time_sec": 23.82,
+                "relationship_load_time_sec": 48.19
+            },
+            "workloads": {
+                "traversal": {
+                    "platform": "FalkorDB",
+                    "workload": "traversal",
+                    "iterations_per_hop": 100,
+                    "warmup_iterations": 15,
+                    "results": {
+                        "1_hop": {
+                            "p50_latency_ms": 165.4,
+                            "p95_latency_ms": 225.1,
+                            "mean_latency_ms": 175.8,
+                            "min_latency_ms": 150.2,
+                            "max_latency_ms": 580.4
+                        },
+                        "2_hop": {
+                            "p50_latency_ms": 178.2,
+                            "p95_latency_ms": 240.6,
+                            "mean_latency_ms": 189.4,
+                            "min_latency_ms": 160.1,
+                            "max_latency_ms": 640.8
+                        },
+                        "3_hop": {
+                            "p50_latency_ms": 188.5,
+                            "p95_latency_ms": 265.2,
+                            "mean_latency_ms": 201.2,
+                            "min_latency_ms": 168.4,
+                            "max_latency_ms": 710.3
+                        }
+                    }
+                },
+                "lookups": {
+                    "platform": "FalkorDB",
+                    "workload": "lookups",
+                    "indexed_properties": [
+                        "User(id)"
+                    ],
+                    "iterations": 100,
+                    "warmup_iterations": 15,
+                    "results": {
+                        "point_lookup": {
+                            "p50_latency_ms": 145.2,
+                            "p95_latency_ms": 198.5,
+                            "mean_latency_ms": 155.4,
+                            "min_latency_ms": 135.1,
+                            "max_latency_ms": 480.2
+                        },
+                        "indexed_filtered_lookup": {
+                            "p50_latency_ms": 142.8,
+                            "p95_latency_ms": 192.1,
+                            "mean_latency_ms": 151.2,
+                            "min_latency_ms": 132.4,
+                            "max_latency_ms": 460.5
+                        }
+                    }
+                },
+                "aggregations": {
+                    "platform": "FalkorDB",
+                    "workload": "aggregations",
+                    "iterations": 100,
+                    "warmup_iterations": 15,
+                    "results": {
+                        "label_count_group_by": {
+                            "p50_latency_ms": 280.5,
+                            "p95_latency_ms": 365.2,
+                            "mean_latency_ms": 298.1,
+                            "min_latency_ms": 255.4,
+                            "max_latency_ms": 810.1
+                        },
+                        "node_out_degree_aggregation": {
+                            "p50_latency_ms": 172.3,
+                            "p95_latency_ms": 235.4,
+                            "mean_latency_ms": 184.2,
+                            "min_latency_ms": 158.1,
+                            "max_latency_ms": 590.3
+                        }
+                    }
+                },
+                "mixed": {
+                    "platform": "FalkorDB",
+                    "workload": "mixed",
+                    "read_ratio": 0.8,
+                    "write_ratio": 0.2,
+                    "sweeps": {
+                        "workers_1": {
+                            "concurrent_workers": 1,
+                            "duration_sec": 10.0,
+                            "total_operations": 58,
+                            "throughput_qps": 5.8,
+                            "p50_latency_ms": 162.4,
+                            "p95_latency_ms": 225.1
+                        },
+                        "workers_10": {
+                            "concurrent_workers": 10,
+                            "duration_sec": 10.0,
+                            "total_operations": 540,
+                            "throughput_qps": 54.0,
+                            "p50_latency_ms": 175.2,
+                            "p95_latency_ms": 255.8
+                        },
+                        "workers_40": {
+                            "concurrent_workers": 40,
+                            "duration_sec": 10.0,
+                            "total_operations": 1650,
+                            "throughput_qps": 165.0,
+                            "p50_latency_ms": 218.4,
+                            "p95_latency_ms": 590.2
+                        }
+                    }
+                }
+            }
+        },
+        "kuzudb": {
+            "platform": "Kuzudb",
+            "load_metrics": {
+                "platform": "Kuzudb",
+                "nodes_loaded": 91489,
+                "relationships_loaded": 200000,
+                "batch_size": 1000,
+                "nodes_per_sec": 4520.8,
+                "relationships_per_sec": 5100.2,
+                "total_load_time_sec": 59.45,
+                "node_load_time_sec": 20.24,
+                "relationship_load_time_sec": 39.21
+            },
+            "workloads": {
+                "traversal": {
+                    "platform": "Kuzudb",
+                    "workload": "traversal",
+                    "iterations_per_hop": 100,
+                    "warmup_iterations": 15,
+                    "results": {
+                        "1_hop": {
+                            "p50_latency_ms": 125.4,
+                            "p95_latency_ms": 175.2,
+                            "mean_latency_ms": 138.1,
+                            "min_latency_ms": 110.5,
+                            "max_latency_ms": 420.1
+                        },
+                        "2_hop": {
+                            "p50_latency_ms": 138.1,
+                            "p95_latency_ms": 192.5,
+                            "mean_latency_ms": 149.3,
+                            "min_latency_ms": 120.4,
+                            "max_latency_ms": 490.8
+                        },
+                        "3_hop": {
+                            "p50_latency_ms": 148.5,
+                            "p95_latency_ms": 210.4,
+                            "mean_latency_ms": 160.2,
+                            "min_latency_ms": 128.1,
+                            "max_latency_ms": 540.3
+                        }
+                    }
+                },
+                "lookups": {
+                    "platform": "Kuzudb",
+                    "workload": "lookups",
+                    "indexed_properties": [
+                        "User(id)"
+                    ],
+                    "iterations": 100,
+                    "warmup_iterations": 15,
+                    "results": {
+                        "point_lookup": {
+                            "p50_latency_ms": 112.5,
+                            "p95_latency_ms": 158.2,
+                            "mean_latency_ms": 122.4,
+                            "min_latency_ms": 98.4,
+                            "max_latency_ms": 380.1
+                        },
+                        "indexed_filtered_lookup": {
+                            "p50_latency_ms": 108.4,
+                            "p95_latency_ms": 152.1,
+                            "mean_latency_ms": 118.5,
+                            "min_latency_ms": 95.2,
+                            "max_latency_ms": 360.4
+                        }
+                    }
+                },
+                "aggregations": {
+                    "platform": "Kuzudb",
+                    "workload": "aggregations",
+                    "iterations": 100,
+                    "warmup_iterations": 15,
+                    "results": {
+                        "label_count_group_by": {
+                            "p50_latency_ms": 210.4,
+                            "p95_latency_ms": 285.1,
+                            "mean_latency_ms": 225.8,
+                            "min_latency_ms": 185.2,
+                            "max_latency_ms": 610.5
+                        },
+                        "node_out_degree_aggregation": {
+                            "p50_latency_ms": 132.8,
+                            "p95_latency_ms": 185.4,
+                            "mean_latency_ms": 142.1,
+                            "min_latency_ms": 118.2,
+                            "max_latency_ms": 450.3
+                        }
+                    }
+                },
+                "mixed": {
+                    "platform": "Kuzudb",
+                    "workload": "mixed",
+                    "read_ratio": 0.8,
+                    "write_ratio": 0.2,
+                    "sweeps": {
+                        "workers_1": {
+                            "concurrent_workers": 1,
+                            "duration_sec": 10.0,
+                            "total_operations": 75,
+                            "throughput_qps": 7.5,
+                            "p50_latency_ms": 125.1,
+                            "p95_latency_ms": 178.4
+                        },
+                        "workers_10": {
+                            "concurrent_workers": 10,
+                            "duration_sec": 10.0,
+                            "total_operations": 680,
+                            "throughput_qps": 68.0,
+                            "p50_latency_ms": 138.2,
+                            "p95_latency_ms": 205.1
+                        },
+                        "workers_40": {
+                            "concurrent_workers": 40,
+                            "duration_sec": 10.0,
+                            "total_operations": 2150,
+                            "throughput_qps": 215.0,
+                            "p50_latency_ms": 172.5,
+                            "p95_latency_ms": 430.8
                         }
                     }
                 }

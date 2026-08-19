@@ -1,0 +1,22 @@
+{
+    "platform": "Kuzudb",
+    "workload": "aggregations",
+    "iterations": 100,
+    "warmup_iterations": 15,
+    "results": {
+        "label_count_group_by": {
+            "p50_latency_ms": 210.4,
+            "p95_latency_ms": 285.1,
+            "mean_latency_ms": 225.8,
+            "min_latency_ms": 185.2,
+            "max_latency_ms": 610.5
+        },
+        "node_out_degree_aggregation": {
+            "p50_latency_ms": 132.8,
+            "p95_latency_ms": 185.4,
+            "mean_latency_ms": 142.1,
+            "min_latency_ms": 118.2,
+            "max_latency_ms": 450.3
+        }
+    }
+}

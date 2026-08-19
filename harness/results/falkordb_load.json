@@ -1,0 +1,11 @@
+{
+    "platform": "FalkorDB",
+    "nodes_loaded": 91489,
+    "relationships_loaded": 200000,
+    "batch_size": 1000,
+    "nodes_per_sec": 3840.1,
+    "relationships_per_sec": 4150.6,
+    "total_load_time_sec": 72.01,
+    "node_load_time_sec": 23.82,
+    "relationship_load_time_sec": 48.19
+}

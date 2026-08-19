@@ -1,0 +1,29 @@
+{
+    "platform": "FalkorDB",
+    "workload": "traversal",
+    "iterations_per_hop": 100,
+    "warmup_iterations": 15,
+    "results": {
+        "1_hop": {
+            "p50_latency_ms": 165.4,
+            "p95_latency_ms": 225.1,
+            "mean_latency_ms": 175.8,
+            "min_latency_ms": 150.2,
+            "max_latency_ms": 580.4
+        },
+        "2_hop": {
+            "p50_latency_ms": 178.2,
+            "p95_latency_ms": 240.6,
+            "mean_latency_ms": 189.4,
+            "min_latency_ms": 160.1,
+            "max_latency_ms": 640.8
+        },
+        "3_hop": {
+            "p50_latency_ms": 188.5,
+            "p95_latency_ms": 265.2,
+            "mean_latency_ms": 201.2,
+            "min_latency_ms": 168.4,
+            "max_latency_ms": 710.3
+        }
+    }
+}

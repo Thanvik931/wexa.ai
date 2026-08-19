@@ -1,0 +1,25 @@
+{
+    "platform": "FalkorDB",
+    "workload": "lookups",
+    "indexed_properties": [
+        "User(id)"
+    ],
+    "iterations": 100,
+    "warmup_iterations": 15,
+    "results": {
+        "point_lookup": {
+            "p50_latency_ms": 145.2,
+            "p95_latency_ms": 198.5,
+            "mean_latency_ms": 155.4,
+            "min_latency_ms": 135.1,
+            "max_latency_ms": 480.2
+        },
+        "indexed_filtered_lookup": {
+            "p50_latency_ms": 142.8,
+            "p95_latency_ms": 192.1,
+            "mean_latency_ms": 151.2,
+            "min_latency_ms": 132.4,
+            "max_latency_ms": 460.5
+        }
+    }
+}

@@ -1,0 +1,29 @@
+{
+    "platform": "Neo4j",
+    "workload": "traversal",
+    "iterations_per_hop": 100,
+    "warmup_iterations": 15,
+    "results": {
+        "1_hop": {
+            "p50_latency_ms": 312.45,
+            "p95_latency_ms": 420.8,
+            "mean_latency_ms": 335.12,
+            "min_latency_ms": 298.1,
+            "max_latency_ms": 1240.5
+        },
+        "2_hop": {
+            "p50_latency_ms": 328.1,
+            "p95_latency_ms": 465.3,
+            "mean_latency_ms": 352.4,
+            "min_latency_ms": 305.2,
+            "max_latency_ms": 1450.8
+        },
+        "3_hop": {
+            "p50_latency_ms": 345.6,
+            "p95_latency_ms": 510.2,
+            "mean_latency_ms": 370.15,
+            "min_latency_ms": 310.4,
+            "max_latency_ms": 1680.1
+        }
+    }
+}

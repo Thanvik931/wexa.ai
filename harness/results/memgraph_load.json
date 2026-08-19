@@ -1,0 +1,11 @@
+{
+    "platform": "Memgraph",
+    "nodes_loaded": 91489,
+    "relationships_loaded": 200000,
+    "batch_size": 1000,
+    "nodes_per_sec": 3120.5,
+    "relationships_per_sec": 3450.8,
+    "total_load_time_sec": 87.26,
+    "node_load_time_sec": 29.32,
+    "relationship_load_time_sec": 57.94
+}

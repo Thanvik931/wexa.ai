@@ -1,0 +1,32 @@
+{
+    "platform": "Kuzudb",
+    "workload": "mixed",
+    "read_ratio": 0.8,
+    "write_ratio": 0.2,
+    "sweeps": {
+        "workers_1": {
+            "concurrent_workers": 1,
+            "duration_sec": 10.0,
+            "total_operations": 75,
+            "throughput_qps": 7.5,
+            "p50_latency_ms": 125.1,
+            "p95_latency_ms": 178.4
+        },
+        "workers_10": {
+            "concurrent_workers": 10,
+            "duration_sec": 10.0,
+            "total_operations": 680,
+            "throughput_qps": 68.0,
+            "p50_latency_ms": 138.2,
+            "p95_latency_ms": 205.1
+        },
+        "workers_40": {
+            "concurrent_workers": 40,
+            "duration_sec": 10.0,
+            "total_operations": 2150,
+            "throughput_qps": 215.0,
+            "p50_latency_ms": 172.5,
+            "p95_latency_ms": 430.8
+        }
+    }
+}

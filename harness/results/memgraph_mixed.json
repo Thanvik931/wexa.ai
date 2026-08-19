@@ -1,0 +1,32 @@
+{
+    "platform": "Memgraph",
+    "workload": "mixed",
+    "read_ratio": 0.8,
+    "write_ratio": 0.2,
+    "sweeps": {
+        "workers_1": {
+            "concurrent_workers": 1,
+            "duration_sec": 10.0,
+            "total_operations": 52,
+            "throughput_qps": 5.2,
+            "p50_latency_ms": 182.1,
+            "p95_latency_ms": 250.4
+        },
+        "workers_10": {
+            "concurrent_workers": 10,
+            "duration_sec": 10.0,
+            "total_operations": 480,
+            "throughput_qps": 48.0,
+            "p50_latency_ms": 195.4,
+            "p95_latency_ms": 280.2
+        },
+        "workers_40": {
+            "concurrent_workers": 40,
+            "duration_sec": 10.0,
+            "total_operations": 1420,
+            "throughput_qps": 142.0,
+            "p50_latency_ms": 245.1,
+            "p95_latency_ms": 680.5
+        }
+    }
+}

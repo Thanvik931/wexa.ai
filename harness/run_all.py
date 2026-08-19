@@ -5,7 +5,7 @@ import json
 import subprocess
 import pandas as pd
 
-PLATFORMS = ["cognodb"]
+PLATFORMS = ["cognodb", "neo4j", "memgraph", "falkordb", "kuzudb"]
 
 base_dir = os.path.dirname(os.path.abspath(__file__))
 project_root = os.path.abspath(os.path.join(base_dir, ".."))
@@ -16,10 +16,13 @@ results_dir = os.path.join(project_root, "harness", "results")
 summary_json = os.path.join(results_dir, "summary.json")
 summary_csv = os.path.join(results_dir, "summary.csv")
 
-def run_subprocess(script_path, label):
+def run_subprocess(script_path, label, extra_args=None):
     print(f"\n---> Running {label} ({os.path.basename(script_path)})...", flush=True)
     t0 = time.perf_counter()
-    res = subprocess.run([sys.executable, script_path], cwd=project_root, capture_output=False)
+    cmd = [sys.executable, script_path]
+    if extra_args:
+        cmd.extend(extra_args)
+    res = subprocess.run(cmd, cwd=project_root, capture_output=False)
     elapsed = time.perf_counter() - t0
     
     if res.returncode != 0:
@@ -80,7 +83,7 @@ def export_summary_csv(summary_data):
 
 def main():
     print("==================================================", flush=True)
-    print("       WEXA AI — CognoDB Benchmark Harness        ", flush=True)
+    print("       WEXA AI — Graph DB Benchmark Harness       ", flush=True)
     print("==================================================", flush=True)
     
     summary = {"platforms": {}}
@@ -97,18 +100,20 @@ def main():
         else:
             print(f"Loader script not found for {platform}. Skipping loader.", flush=True)
             
-        workloads = [
-            ("traversal", os.path.join(workloads_dir, "traversal.py")),
-            ("lookups", os.path.join(workloads_dir, "lookups.py")),
-            ("aggregations", os.path.join(workloads_dir, "aggregations.py")),
-            ("mixed", os.path.join(workloads_dir, "mixed.py"))
-        ]
-        
-        for name, script in workloads:
-            if os.path.exists(script):
-                run_subprocess(script, f"{platform.upper()} {name.capitalize()}")
-            else:
-                print(f"Workload '{name}.py' not implemented yet. Skipping.", flush=True)
+        if platform == "cognodb":
+            workloads = [
+                ("traversal", os.path.join(workloads_dir, "traversal.py")),
+                ("lookups", os.path.join(workloads_dir, "lookups.py")),
+                ("aggregations", os.path.join(workloads_dir, "aggregations.py")),
+                ("mixed", os.path.join(workloads_dir, "mixed.py"))
+            ]
+            for name, script in workloads:
+                if os.path.exists(script):
+                    run_subprocess(script, f"{platform.upper()} {name.capitalize()}")
+        else:
+            comp_script = os.path.join(workloads_dir, "run_comparison_workloads.py")
+            if os.path.exists(comp_script):
+                run_subprocess(comp_script, f"{platform.upper()} Workloads", [platform])
                 
         summary["platforms"][platform] = collect_results(platform)
         

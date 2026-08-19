@@ -1,0 +1,22 @@
+{
+    "platform": "Neo4j",
+    "workload": "aggregations",
+    "iterations": 100,
+    "warmup_iterations": 15,
+    "results": {
+        "label_count_group_by": {
+            "p50_latency_ms": 620.4,
+            "p95_latency_ms": 780.9,
+            "mean_latency_ms": 645.2,
+            "min_latency_ms": 580.1,
+            "max_latency_ms": 1420.3
+        },
+        "node_out_degree_aggregation": {
+            "p50_latency_ms": 315.8,
+            "p95_latency_ms": 430.2,
+            "mean_latency_ms": 330.1,
+            "min_latency_ms": 295.4,
+            "max_latency_ms": 950.6
+        }
+    }
+}
