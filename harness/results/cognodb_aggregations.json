@@ -5,21 +5,21 @@
     "warmup_iterations": 15,
     "results": {
         "label_count_group_by": {
-            "p50_latency_ms": 514.72,
-            "p95_latency_ms": 798.83,
-            "mean_latency_ms": 546.9,
-            "min_latency_ms": 410.83,
-            "max_latency_ms": 1572.36,
+            "p50_latency_ms": 476.25,
+            "p95_latency_ms": 564.87,
+            "mean_latency_ms": 484.78,
+            "min_latency_ms": 415.57,
+            "max_latency_ms": 1109.8,
             "server_engine_p50_ms": 0.0,
             "server_engine_p95_ms": 0.0,
             "server_engine_mean_ms": 0.0
         },
         "node_out_degree_aggregation": {
-            "p50_latency_ms": 289.48,
-            "p95_latency_ms": 437.56,
-            "mean_latency_ms": 303.66,
-            "min_latency_ms": 241.21,
-            "max_latency_ms": 794.88,
+            "p50_latency_ms": 251.31,
+            "p95_latency_ms": 343.82,
+            "mean_latency_ms": 264.42,
+            "min_latency_ms": 245.04,
+            "max_latency_ms": 483.81,
             "server_engine_p50_ms": 0.0,
             "server_engine_p95_ms": 0.0,
             "server_engine_mean_ms": 0.0

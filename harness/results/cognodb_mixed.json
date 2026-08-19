@@ -1,0 +1,44 @@
+{
+    "platform": "CognoDB",
+    "workload": "mixed",
+    "read_ratio": 0.8,
+    "write_ratio": 0.2,
+    "sweeps": {
+        "workers_1": {
+            "concurrent_workers": 1,
+            "duration_sec": 10.11,
+            "total_operations": 36,
+            "throughput_qps": 3.56,
+            "read_count": 27,
+            "write_count": 9,
+            "p50_latency_ms": 247.5,
+            "p95_latency_ms": 364.86,
+            "read_p95_ms": 272.76,
+            "write_p95_ms": 666.74
+        },
+        "workers_10": {
+            "concurrent_workers": 10,
+            "duration_sec": 10.36,
+            "total_operations": 345,
+            "throughput_qps": 33.29,
+            "read_count": 278,
+            "write_count": 67,
+            "p50_latency_ms": 256.35,
+            "p95_latency_ms": 363.79,
+            "read_p95_ms": 343.34,
+            "write_p95_ms": 458.88
+        },
+        "workers_40": {
+            "concurrent_workers": 40,
+            "duration_sec": 10.85,
+            "total_operations": 1033,
+            "throughput_qps": 95.22,
+            "read_count": 833,
+            "write_count": 200,
+            "p50_latency_ms": 294.57,
+            "p95_latency_ms": 923.87,
+            "read_p95_ms": 429.55,
+            "write_p95_ms": 984.8
+        }
+    }
+}

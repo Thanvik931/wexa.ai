@@ -1,2 +1,2 @@
 Platform,Nodes_Loaded,Relationships_Loaded,Batch_Size,Nodes_Per_Sec,Relationships_Per_Sec,Total_Load_Time_Sec,Traversal_1_hop_p50_ms,Traversal_1_hop_p95_ms,Traversal_2_hop_p50_ms,Traversal_2_hop_p95_ms,Traversal_3_hop_p50_ms,Traversal_3_hop_p95_ms
-Cognodb,91489,200000,1000,2789.54,3262.15,94.81,270.05,272.69,270.14,273.35,270.19,305.03
+Cognodb,91489,200000,1000,2771.58,2893.88,102.85,256.46,345.58,255.02,306.67,255.63,316.39
